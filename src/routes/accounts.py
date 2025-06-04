@@ -358,7 +358,6 @@ async def refresh_access_token(
     """
        Allows users to refresh their access token by providing a valid refresh token.
        """
-    decoded_token_payload = None
     try:
         decoded_token_payload = jwt_manager.decode_refresh_token(request.refresh_token)
 
