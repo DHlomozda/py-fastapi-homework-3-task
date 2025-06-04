@@ -20,12 +20,14 @@ from exceptions import BaseSecurityError
 from schemas import UserRegistrationRequestSchema, UserRegistrationResponseSchema
 from schemas.accounts import (
     UserLoginRequestSchema,
-    UserRegistrationResponseSchema,
     MessageResponseSchema,
     DetailResponse,
     UserActivationRequestSchema,
     PasswordResetRequestSchema,
-    UserLoginResponseSchema, PasswordResetCompleteRequestSchema, TokenRefreshResponseSchema, TokenRefreshRequestSchema
+    UserLoginResponseSchema,
+    PasswordResetCompleteRequestSchema,
+    TokenRefreshResponseSchema,
+    TokenRefreshRequestSchema
 )
 from security.interfaces import JWTAuthManagerInterface
 router = APIRouter()
@@ -243,7 +245,7 @@ async def password_reset(
         await db.rollback()
 
         return {"message": "If you are registered, you will receive an email with instructions."}
-    except Exception as e:
+    except Exception:
         return {"message": "If you are registered, you will receive an email with instructions."}
 
 
@@ -319,13 +321,13 @@ async def complete_password_reset(
     except HTTPException:
         await db.rollback()
         raise
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while resetting the password."
         )
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -361,7 +363,7 @@ async def refresh_access_token(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid refresh token format or signature."
@@ -417,13 +419,13 @@ async def refresh_access_token(
 
     except HTTPException:
         raise
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while refreshing the token."
         )
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
