@@ -30,6 +30,7 @@ from schemas.accounts import (
     TokenRefreshRequestSchema
 )
 from security.interfaces import JWTAuthManagerInterface
+
 router = APIRouter()
 
 
@@ -38,8 +39,8 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED
 )
 async def register_user(
-    user_data: UserRegistrationRequestSchema,
-    db: AsyncSession = Depends(get_db),
+        user_data: UserRegistrationRequestSchema,
+        db: AsyncSession = Depends(get_db),
 ) -> UserRegistrationResponseSchema:
     existing_user = await db.scalar(
         select(
@@ -86,15 +87,18 @@ async def register_user(
             status_code=500,
             detail="An error occurred during user creation."
         )
-    return new_user
+    return UserRegistrationResponseSchema(
+        id=new_user.id,
+        email=new_user.email,
+    )
 
 
 @router.post("/login/", status_code=status.HTTP_201_CREATED)
 async def login_user(
-    user_data: UserLoginRequestSchema,
-    db: AsyncSession = Depends(get_db),
-    jwt_manager: JWTAuthManagerInterface = Depends(get_jwt_auth_manager),
-    settings: BaseAppSettings = Depends(get_settings)
+        user_data: UserLoginRequestSchema,
+        db: AsyncSession = Depends(get_db),
+        jwt_manager: JWTAuthManagerInterface = Depends(get_jwt_auth_manager),
+        settings: BaseAppSettings = Depends(get_settings)
 ) -> UserLoginResponseSchema:
     user = await db.scalar(
         select(
@@ -146,8 +150,8 @@ async def login_user(
     }
 )
 async def activate_account(
-    request: UserActivationRequestSchema,
-    db: AsyncSession = Depends(get_db)
+        request: UserActivationRequestSchema,
+        db: AsyncSession = Depends(get_db)
 ):
     """
     Activates a user's account using a valid activation token and email.
@@ -214,8 +218,8 @@ async def activate_account(
     }
 )
 async def password_reset(
-    request: PasswordResetRequestSchema,
-    db: AsyncSession = Depends(get_db)
+        request: PasswordResetRequestSchema,
+        db: AsyncSession = Depends(get_db)
 ):
     """
        Allows users to request a password reset token.
@@ -258,8 +262,8 @@ async def password_reset(
     }
 )
 async def complete_password_reset(
-    request: PasswordResetCompleteRequestSchema,
-    db: AsyncSession = Depends(get_db)
+        request: PasswordResetCompleteRequestSchema,
+        db: AsyncSession = Depends(get_db)
 ):
     """
         Allows users to reset their password using a valid password reset token.
@@ -347,9 +351,9 @@ async def complete_password_reset(
     }
 )
 async def refresh_access_token(
-    request: TokenRefreshRequestSchema,
-    db: AsyncSession = Depends(get_db),
-    jwt_manager: JWTAuthManagerInterface = Depends(get_jwt_auth_manager)
+        request: TokenRefreshRequestSchema,
+        db: AsyncSession = Depends(get_db),
+        jwt_manager: JWTAuthManagerInterface = Depends(get_jwt_auth_manager)
 ):
     """
        Allows users to refresh their access token by providing a valid refresh token.
